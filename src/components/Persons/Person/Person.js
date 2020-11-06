@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import classes from '../../../index.css';
-import Aux from '../../../HOC/Auxilary';
+import Aux from '../../../HOC/Auxilary/Auxilary';
 import withClass from '../../../HOC/WithClass';
 import PropType from 'prop-types';
 import AuthContext from "../../../context/auth-context";
