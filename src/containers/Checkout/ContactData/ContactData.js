@@ -4,7 +4,7 @@ import classes from './ContactData.css';
 import axios from '../../../axios-orders';
 import Input from '../../../components/UI/Input/Input';
 
-const setInput = (etype ,  type , placeholder , value, r, v,min,max) => {
+const setInput = (etype ,  type , placeholder , value, r, v,min,max,touch) => {
   return {
     elementType: etype,
     elementConfig: {
@@ -17,7 +17,8 @@ const setInput = (etype ,  type , placeholder , value, r, v,min,max) => {
       minLength: min,
       maxLength: max
     },
-    valid: v
+    valid: v,
+    touched: touch 
   }
 }
 
@@ -28,14 +29,15 @@ const ContactData = (props) => {
         street : ' ',
         postalCode : ' '
     });
+    let [formIsValid, setformIsValid] = useState(false);
     let [loading , setLoading] = useState(false);
     let [price , setPrice] = useState(0);
     let [orderForm, setOrderForm] = useState({
-      name : setInput('input','text','Your Name','',true,false,0,50),
-      street: setInput('input','text','Your Street','',true,false,0,50),
-      zipcode: setInput('input','text','Your Zipcode','',true,false,2,5),
-      country: setInput('input','text','Your Country','',true,false,0,50),
-      email: setInput('input','text','Your Email','',true,false,0,50),
+      name : setInput('input','text','Your Name','',true,false,0,50,false),
+      street: setInput('input','text','Your Street','',true,false,0,50,false),
+      zipcode: setInput('input','text','Your Zipcode','',true,false,2,5,false),
+      country: setInput('input','text','Your Country','',true,false,0,50,false),
+      email: setInput('input','text','Your Email','',true,false,0,50,false),
       deliveryMethod: {
         elementType: 'select',
         elementConfig: {
@@ -44,11 +46,9 @@ const ContactData = (props) => {
             {value: 'cheapest', displayValue: 'Cheapest'}
           ]
         },
-        value: '',
-        validation: {
-          required: true
-        },
-        valid: false
+        value: 'fastest',
+        valid: true,
+        touched: false
       } ,
     })
 
@@ -81,16 +81,18 @@ const ContactData = (props) => {
     const checkValidity = (value, rules) => {
       let isValid = true;
 
-      if(rules.required) {
-        isValid = value.trim() !== '' && isValid;
-      }
-
-      if(rules.minLength) {
-        isValid = value.length >= rules.minLength && isValid;
-      }
-
-      if(rules.maxLength) {
-        isValid = value.length <= rules.maxLength && isValid;
+      if(rules) {
+        if(rules.required) {
+          isValid = value.trim() !== '' && isValid;
+        }
+  
+        if(rules.minLength) {
+          isValid = value.length >= rules.minLength && isValid;
+        }
+  
+        if(rules.maxLength) {
+          isValid = value.length <= rules.maxLength && isValid;
+        }
       }
 
       console.log(isValid);
@@ -108,9 +110,14 @@ const ContactData = (props) => {
       };
       updatedFormElement.value = event.target.value;
       updatedFormElement.valid = checkValidity(updatedFormElement.value, updatedFormElement.validation);
-      console.log(updatedFormElement);
+      updatedFormElement.touched = true;
       updatedOrderForm[inputIdentifier] = updatedFormElement;
+      let FormisValid = true;
+      for(let inputIdentifier in updatedOrderForm){
+        FormisValid = updatedOrderForm[inputIdentifier].valid && FormisValid;
+      }
       setOrderForm(updatedOrderForm);
+      setformIsValid(FormisValid);
     }
 
     let formElementsArray = [];
@@ -134,12 +141,13 @@ const ContactData = (props) => {
                     value={formElement.config.value}
                     invalid = {!formElement.config.valid}
                     shouldValidate = {formElement.config.validation}
+                    touched = {formElement.config.touched}
                     changed={(event) => inputChangeHandler(event, formElement.id)}
                   />
                 })
               }
 
-                <Button btnType="Success">ORDER</Button>
+                <Button btnType="Success" disabled={!formIsValid}>ORDER</Button>
             </form>
         </div>
 

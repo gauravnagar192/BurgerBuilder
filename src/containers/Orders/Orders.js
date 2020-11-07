@@ -33,7 +33,7 @@ const Orders = () => {
           <Order
             key={order.id}
             ingredients={order.ingredients}
-            price={order.price}
+            price={Number.parseFloat(order.price).toFixed(2)}
           />
         );
       })}
