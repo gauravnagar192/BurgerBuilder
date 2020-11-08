@@ -11,7 +11,6 @@ import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../HOC/withErrorHandler/withErrorHandler';
 import { element } from 'prop-types';
 
-
 const BurgerBuilder = (props) => {
   const [state, setState] = useState({
     ingredients: {
@@ -28,8 +27,8 @@ const BurgerBuilder = (props) => {
   let [loading, setLoading] = useState(false);
 
   useEffect(() => {
-      // CODE FOR READING INGREDIENTS DATA FROM FIREBASE & SETTING IT ON BURGER
-      /*
+    // CODE FOR READING INGREDIENTS DATA FROM FIREBASE & SETTING IT ON BURGER
+    /*
       axios.get('https://react-myburger-c32d2.firebaseio.com/ingredients.json')
         .then(res => {
           const totalPrice = state.totalPrice;
@@ -53,7 +52,7 @@ const BurgerBuilder = (props) => {
           };
           setState(newState);
         }) */
-  },[])
+  }, []);
 
   const purchaseHandler = () => {
     const ingredients = state.ingredients;
@@ -67,13 +66,13 @@ const BurgerBuilder = (props) => {
     // setLoading(true)
     // const order = {
     //   ingredients : state.ingredients ,
-    //   price : state.totalPrice , 
+    //   price : state.totalPrice ,
     //   customer : {
     //     name : 'gaurav nagar' ,
     //     address : {
     //       street : 'TestStreet 1' ,
     //       zipcode :   '41351' ,
-    //       country : 'Germany' 
+    //       country : 'Germany'
     //     } ,
     //     email : 'gauravnagar11@gmail.com'
     //   },
@@ -90,17 +89,8 @@ const BurgerBuilder = (props) => {
     //   purchaseCancelHandler();
     //   console.log(err);
     // })
-    
-    const queryParams = [];
-    for(let i in state.ingredients) {
-      queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(state.ingredients[i]))
-    }
-    queryParams.push('price='+state.totalPrice);
-    const queryString = queryParams.join('&');
-    props.history.push({
-      pathname: '/checkout',
-      search: '?' + queryString
-    });
+
+    props.history.push('/checkout');
   };
 
   const purchaseCancelHandler = () => {
@@ -160,15 +150,17 @@ const BurgerBuilder = (props) => {
     disabledInfo[key] = disabledInfo[key] <= 0;
   }
 
-  let orderSummary = <OrderSummary
-                        ingredients={props.ings}
-                        purchaseContinue={purchaseContinuehandler}
-                        purchaseCancel={purchaseCancelHandler}
-                        price={props.pr.toFixed(2)}
-                      /> ;
+  let orderSummary = (
+    <OrderSummary
+      ingredients={props.ings}
+      purchaseContinue={purchaseContinuehandler}
+      purchaseCancel={purchaseCancelHandler}
+      price={props.pr.toFixed(2)}
+    />
+  );
 
-  if(loading) {
-    orderSummary = <Spinner />
+  if (loading) {
+    orderSummary = <Spinner />;
   }
 
   return (
@@ -189,20 +181,29 @@ const BurgerBuilder = (props) => {
   );
 };
 
-
 const mapStatetoProps = (State) => {
   return {
-    ings : State.ingredients,
-    pr : State.totalPrice
-  }
-}
+    ings: State.ingredients,
+    pr: State.totalPrice,
+  };
+};
 
 const mapDispatchtoProps = (Dispatch) => {
   return {
-    onAddIngredients : (ingredient) => Dispatch({type: actionType.ADD_INGREDIENTS,ingredientName: ingredient }),
-    onRemoveIngredients : (ingredient) => Dispatch({type: actionType.REMOVE_INGREDIENTS,ingredientName: ingredient })
-  }
-}
+    onAddIngredients: (ingredient) =>
+      Dispatch({
+        type: actionType.ADD_INGREDIENTS,
+        ingredientName: ingredient,
+      }),
+    onRemoveIngredients: (ingredient) =>
+      Dispatch({
+        type: actionType.REMOVE_INGREDIENTS,
+        ingredientName: ingredient,
+      }),
+  };
+};
 
-
-export default connect(mapStatetoProps,mapDispatchtoProps)(withErrorHandler(BurgerBuilder, axios));
+export default connect(
+  mapStatetoProps,
+  mapDispatchtoProps
+)(withErrorHandler(BurgerBuilder, axios));
